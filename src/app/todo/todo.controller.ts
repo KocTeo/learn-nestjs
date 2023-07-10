@@ -15,6 +15,8 @@ import { CreateTodoDTO } from './dto/create-todo.dto';
 import { UpdateTodoDTO } from './dto/update-todo.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { IndexTodoSwagger } from './swagger/index-todo.swagger';
+import { BadRequestSwagger } from 'src/helpers/swagger/bad-request.swagger';
+import { NotFoundSwagger } from 'src/helpers/swagger/not-found.swagger';
 
 @Controller('todo')
 @ApiTags('todos')
@@ -40,7 +42,11 @@ export class TodoController {
     description: 'Novo Todo criado com sucesso',
     type: IndexTodoSwagger,
   })
-  @ApiResponse({ status: 400, description: 'Parâmetros inválidos' })
+  @ApiResponse({
+    status: 400,
+    description: 'Parâmetros inválidos',
+    type: BadRequestSwagger,
+  })
   async create(@Body() data: CreateTodoDTO) {
     return await this.todoService.create(data);
   }
@@ -52,7 +58,11 @@ export class TodoController {
     description: 'Dados do Todo retornado com sucesso',
     type: IndexTodoSwagger,
   })
-  @ApiResponse({ status: 404, description: 'Todo não encontrado' })
+  @ApiResponse({
+    status: 404,
+    description: 'Todo não encontrado',
+    type: NotFoundSwagger,
+  })
   async show(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.todoService.findOneOrFail(id);
   }
@@ -64,7 +74,16 @@ export class TodoController {
     description: 'Dados do Todo atualizado com sucesso',
     type: IndexTodoSwagger,
   })
-  @ApiResponse({ status: 404, description: 'Todo não encontrado' })
+  @ApiResponse({
+    status: 400,
+    description: 'Parâmetros inválidos',
+    type: BadRequestSwagger,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Todo não encontrado',
+    type: NotFoundSwagger,
+  })
   async update(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() data: UpdateTodoDTO,
@@ -76,7 +95,11 @@ export class TodoController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'deletar um Todo' })
   @ApiResponse({ status: 204, description: 'Todo deletado com sucesso' })
-  @ApiResponse({ status: 404, description: 'Todo não encontrado' })
+  @ApiResponse({
+    status: 404,
+    description: 'Todo não encontrado',
+    type: NotFoundSwagger,
+  })
   async destroy(@Param('id', new ParseUUIDPipe()) id: string) {
     await this.todoService.deleteById(id);
   }
